@@ -102,58 +102,55 @@ export default function Navbar() {
         <div className="md:hidden bg-white border-t">
           <div className="container mx-auto px-4 py-3 flex flex-col space-y-2">
             <Link
-              href="/#about"
+              href="/about-us"
               className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               About
             </Link>
             <Link
-              href="/#solutions"
+              href="/solutions"
               className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               Solutions
             </Link>
             <Link
-              href="/#industries"
-              className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Industries
-            </Link>
-            <Link
-              href="/#vendors"
+              href="/vendors"
               className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               Vendors
             </Link>
             <Link
-              href="/#blogs"
+              href="/blogs"
               className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               Blogs
             </Link>
             <Link
-              href="/#career"
+              href="/career"
               className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               Careers
             </Link>
             <Link
-              href="/#contact"
+              href="/contact"
               className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               Contact
             </Link>
             <Button
+               
               size="sm"
               className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 transition-all duration-300"
-              onClick={() => setIsMenuOpen(false)}
+              onClick={() => {
+                setIsMenuOpen(false);
+                router.push("/form");
+              }}              
             >
               Become a Vendor
             </Button>
