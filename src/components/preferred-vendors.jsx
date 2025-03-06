@@ -4,6 +4,7 @@ import { useState } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Star, ArrowRight, ExternalLink, Award } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 const vendors = [
   {
@@ -63,6 +64,7 @@ const vendors = [
 ]
 
 export default function PremiumVendorsGrid() {
+  const router = useRouter()
   const [hoveredVendor, setHoveredVendor] = useState(null)
 
   return (
@@ -167,6 +169,7 @@ export default function PremiumVendorsGrid() {
 
         <div className="text-center mt-12">
           <Button 
+          onClick={() => router.push("/vendors")}
             size="lg"
             className="bg-gradient-to-r from-blue-600 to-cyan-500 
               hover:from-blue-700 hover:to-cyan-600 

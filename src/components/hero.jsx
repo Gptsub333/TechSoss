@@ -4,8 +4,10 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ArrowRight, ChevronRight } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export default function Hero() {
+  const router = useRouter()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -57,6 +59,7 @@ export default function Hero() {
             className="flex flex-col sm:flex-row items-center justify-center gap-4"
           >
             <Button
+              onClick={()=>router.push('/solutions')}
               size="lg"
               className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 transition-all duration-300 shadow-lg hover:shadow-xl group"
             >
@@ -64,6 +67,7 @@ export default function Hero() {
               <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button
+              onClick={()=>router.push('/form')}
               variant="outline"
               size="lg"
               className="border-slate-300 hover:bg-slate-50 transition-all duration-300"

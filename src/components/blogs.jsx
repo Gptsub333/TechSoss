@@ -1,5 +1,5 @@
 "use client"
-
+import { useRouter } from "next/navigation";
 import { motion, useAnimation } from "framer-motion"
 import { useInView } from "react-intersection-observer"
 import { useEffect } from "react"
@@ -43,6 +43,7 @@ const blogs = [
 ]
 
 export default function Blogs() {
+  const router = useRouter();
   const controls = useAnimation()
   const [ref, inView] = useInView({ threshold: 0.1, triggerOnce: true })
 
@@ -128,6 +129,7 @@ export default function Blogs() {
                 <h3 className="text-xl font-bold text-slate-800 mb-3 line-clamp-2">{blog.title}</h3>
                 <p className="text-slate-600 mb-4 line-clamp-3">{blog.excerpt}</p>
                 <Button
+                  onClick={() => router.push(`/blogs`)}
                   variant="ghost"
                   className="p-0 h-auto text-blue-600 hover:text-blue-700 hover:bg-transparent group"
                 >
@@ -140,7 +142,7 @@ export default function Blogs() {
         </motion.div>
 
         <div className="text-center mt-12">
-          <Button className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 transition-all duration-300 shadow-md hover:shadow-lg group">
+          <Button onClick ={()=> router.push("/blogs")}className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 transition-all duration-300 shadow-md hover:shadow-lg group">
             View All Articles
             <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
           </Button>

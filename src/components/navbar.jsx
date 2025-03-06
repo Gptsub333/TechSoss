@@ -5,8 +5,10 @@ import Link from "next/link"
 import { Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { useRouter } from "next/navigation"
 
 export default function Navbar() {
+    const router = useRouter()
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
 
@@ -38,56 +40,50 @@ export default function Navbar() {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-1">
+        <Link
+            href="/"
+            className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
+          >
+            Home
+          </Link>
           <Link
-            href="/#about"
+            href="/about-us"
             className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
           >
             About
           </Link>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <button className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors">
-                Solutions
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem>
-                <Link href="/#solutions" className="w-full">
-                  All Solutions
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Link href="/#industries" className="w-full">
-                  Industries
-                </Link>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
           <Link
-            href="/#vendors"
+            href="/solutions"
+            className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
+          >
+            Solutions
+          </Link>
+          <Link
+            href="/vendors"
             className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
           >
             Vendors
           </Link>
           <Link
-            href="/#blogs"
+            href="/blogs"
             className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
           >
             Blogs
           </Link>
           <Link
-            href="/#career"
+            href="/career"
             className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
           >
             Careers
           </Link>
           <Link
-            href="/#contact"
+            href="/contact"
             className="px-3 py-2 text-sm font-medium text-slate-700 hover:text-blue-600 transition-colors"
           >
             Contact
           </Link>
           <Button
+            onClick={() => router.push("/form")}
             size="sm"
             className="ml-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 transition-all duration-300 shadow-md hover:shadow-lg"
           >

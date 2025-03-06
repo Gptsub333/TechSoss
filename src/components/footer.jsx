@@ -37,12 +37,12 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="/#solutions" className="hover:text-slate-400 transition-colors text-sm">
+                <a href="/solutions" className="hover:text-slate-400 transition-colors text-sm">
                   Solutions
                 </a>
               </li>
               <li>
-                <a href="/#vendors" className="hover:text-slate-400 transition-colors text-sm">
+                <a href="/vendors" className="hover:text-slate-400 transition-colors text-sm">
                   Vendors
                 </a>
               </li>
@@ -52,12 +52,12 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="/#career" className="hover:text-slate-400 transition-colors text-sm">
+                <a href="/career" className="hover:text-slate-400 transition-colors text-sm">
                   Careers
                 </a>
               </li>
               <li>
-                <a href="/#contact" className="hover:text-slate-400 transition-colors text-sm">
+                <a href="/contact" className="hover:text-slate-400 transition-colors text-sm">
                   Contact
                 </a>
               </li>
@@ -67,14 +67,14 @@ export default function Footer() {
           <div>
             <h4 className="text-lg font-bold mb-4">Contact Us</h4>
             <p className="text-sm">
-              1234 Tech Avenue, Suite 500
-              <br />
-              San Francisco, CA 94107
+               15101 Ronald Reagan Blvd Suite 510,
+              <br /> 
+              Leander, TX, 77641, USA.
             </p>
             <p className="text-sm mt-2">
               info@techsoss.com
               <br />
-              +1 (555) 123-4567
+              +1 408-598-7831
             </p>
           </div>
         </div>

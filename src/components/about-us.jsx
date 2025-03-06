@@ -3,9 +3,11 @@
 import { motion, useAnimation } from "framer-motion"
 import { useInView } from "react-intersection-observer"
 import { useEffect } from "react"
-import { Users, Building2, BarChart3, Globe } from "lucide-react"
+import { Users, Building2, BarChart3, Globe, ArrowRight } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export default function AboutUs() {
+  const router = useRouter()
   const controls = useAnimation()
   const [ref, inView] = useInView({ threshold: 0.2, triggerOnce: true })
 
@@ -33,6 +35,7 @@ export default function AboutUs() {
       transition: { duration: 0.5, ease: "easeOut" },
     },
   }
+
 
   return (
     <section id="about" className="py-20 bg-white overflow-hidden">
@@ -93,6 +96,33 @@ export default function AboutUs() {
                 </div>
               </div>
             </div>
+
+            {/* Navigation Buttons */}
+            <div className="flex flex-wrap gap-4 mt-8">
+              <button
+                onClick={() => router.push('/solutions')}
+                className="flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-300"
+              >
+                Our Services
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </button>
+              
+              <button
+                onClick={() => router.push('/about-us')}
+                className="flex items-center px-6 py-3 bg-white hover:bg-blue-50 text-blue-600 font-medium rounded-lg border border-blue-200 transition-colors duration-300"
+              >
+                Meet Our Team
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </button>
+              
+              <button
+                onClick={() => router.push('/contact')}
+                className="flex items-center px-6 py-3 bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium rounded-lg transition-colors duration-300"
+              >
+                Contact Us
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </button>
+            </div>
           </motion.div>
 
           <motion.div
@@ -141,4 +171,3 @@ export default function AboutUs() {
     </section>
   )
 }
-

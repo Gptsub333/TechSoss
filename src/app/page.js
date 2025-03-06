@@ -10,6 +10,8 @@ import Career from "@/components/career"
 import Industries from "@/components/industries"
 import Contact from "@/components/contact"
 import Footer from "@/components/footer"
+import { CtaSection } from "@/components/cta-section"
+import FAQSection from "@/components/faq"
 
 export default function Home() {
   return (
@@ -23,8 +25,8 @@ export default function Home() {
       <Solutions />
       <Blogs />
       <Industries />
-      <Career />
-      <Contact />
+      <CtaSection />
+      <FAQSection />
       <Footer />
     </main>
   )
