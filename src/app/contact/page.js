@@ -2,17 +2,27 @@
 
 import { motion, useAnimation } from "framer-motion"
 import { useInView } from "react-intersection-observer"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { MapPin, Phone, Mail, Clock, Send, Facebook, Twitter, Linkedin, Instagram } from "lucide-react"
 import Footer from "@/components/footer"
+import emailjs from 'emailjs-com';
 
 export default function Contact() {
   const controls = useAnimation()
   const [ref, inView] = useInView({ threshold: 0.1, triggerOnce: true })
+  const [formData, setFormData] = useState({
+    from_name: "",
+    to_name: "TechSoss",
+    message: "",
+    reply_to: "",
+    subject: ""
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState(null)
 
   useEffect(() => {
     if (inView) {
@@ -39,6 +49,50 @@ export default function Contact() {
     },
   }
 
+  const handleChange = (e) => {
+    const { id, value } = e.target;
+    
+    // Map form fields to the expected template parameters
+    if (id === "name") {
+      setFormData({ ...formData, from_name: value });
+    } else if (id === "email") {
+      setFormData({ ...formData, reply_to: value });
+    } else if (id === "subject") {
+      setFormData({ ...formData, subject: value });
+    } else if (id === "message") {
+      setFormData({ ...formData, message: value });
+    }
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Use the specified service and template IDs
+    emailjs.send(
+      "service_f1oy4hd",
+      "template_hhw956l",
+      formData,
+      "sPRSvqX1oUVKYnD2M",
+    ).then((result) => {
+      console.log("Email sent successfully:", result.text);
+      setSubmitStatus("success");
+      // Reset form
+      setFormData({
+        from_name: "",
+        to_name: "TechSoss",
+        message: "",
+        reply_to: "",
+        subject: ""
+      });
+    }).catch((error) => {
+      console.error("Failed to send email:", error.text);
+      setSubmitStatus("error");
+    }).finally(() => {
+      setIsSubmitting(false);
+    });
+  }
+
   return (
     <div><section id="contact" className="py-20 bg-slate-50">
       <div className="container mx-auto px-4">
@@ -58,33 +112,72 @@ export default function Contact() {
         <div className="grid md:grid-cols-2 gap-12">
           <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.7 }}>
             <h3 className="text-2xl font-bold text-slate-800 mb-6">Send Us a Message</h3>
-            <form className="space-y-4">
+            <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="name">Name</Label>
-                  <Input id="name" placeholder="John Doe" />
+                  <Input 
+                    id="name" 
+                    placeholder="John Doe"
+                    value={formData.from_name}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="john@example.com" />
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="john@example.com"
+                    value={formData.reply_to}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="subject">Subject</Label>
-                <Input id="subject" placeholder="How can we help you?" />
+                <Input 
+                  id="subject" 
+                  placeholder="How can we help you?"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  required
+                />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="message">Message</Label>
-                <Textarea id="message" placeholder="Your message here..." className="min-h-[150px]" />
+                <Textarea 
+                  id="message" 
+                  placeholder="Your message here..." 
+                  className="min-h-[150px]"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                />
               </div>
+
+              {submitStatus === "success" && (
+                <div className="p-3 bg-green-50 text-green-700 rounded-md">
+                  Your message has been sent successfully! We'll get back to you soon.
+                </div>
+              )}
+              
+              {submitStatus === "error" && (
+                <div className="p-3 bg-red-50 text-red-700 rounded-md">
+                  There was an error sending your message. Please try again later.
+                </div>
+              )}
 
               <Button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 transition-all duration-300 shadow-md hover:shadow-lg group"
               >
-                Send Message
+                {isSubmitting ? "Sending..." : "Send Message"}
                 <Send className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </Button>
             </form>
@@ -180,4 +273,3 @@ export default function Contact() {
     </div>
   )
 }
-

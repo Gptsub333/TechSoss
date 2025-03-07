@@ -1,6 +1,10 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
+import { useRouter } from "next/navigation"
 
 export function CtaSection() {
+  const router = useRouter()
   return (
     <section
       className="relative overflow-hidden px-4 py-20 md:px-8"
@@ -41,6 +45,7 @@ export function CtaSection() {
 
           <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
             <Button 
+              onClick={()=>router.push('https://calendly.com/harsh-langaliya-holbox/30min')}
               size="lg" 
               className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 transition-all duration-300 shadow-md hover:shadow-lg p-6 px-8 text-white rounded-full text-base font-medium"
             >
@@ -48,6 +53,7 @@ export function CtaSection() {
             </Button>
             
             <Button
+            onClick={()=>router.push('/solutions')}
               size="lg"
               variant="outline"
               className="border-2 border-blue-600 text-blue-600 hover:bg-blue-50 transition-all duration-300 p-6 px-8 rounded-full text-base font-medium"

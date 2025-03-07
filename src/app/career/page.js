@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Upload, CheckCircle, Briefcase, MapPin, Clock, ArrowRight } from "lucide-react"
 import Footer from "@/components/footer"
+import emailjs from 'emailjs-com';
 
 const jobs = [
   {
@@ -46,7 +47,23 @@ export default function Career() {
   const controls = useAnimation()
   const [ref, inView] = useInView({ threshold: 0.1, triggerOnce: true })
   const [fileName, setFileName] = useState("")
+  const [resumeFile, setResumeFile] = useState(null)
   const [isUploaded, setIsUploaded] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState(null)
+  
+  const [formData, setFormData] = useState({
+    from_name: "",
+    to_name: "TechSoss HR",
+    message: "",
+    reply_to: "",
+    subject: "Job Application",
+    first_name: "",
+    last_name: "",
+    phone: "",
+    position: "",
+    resume_name: ""
+  })
 
   useEffect(() => {
     if (inView) {
@@ -73,11 +90,93 @@ export default function Career() {
     },
   }
 
+  const handleInputChange = (e) => {
+    const { id, value } = e.target;
+    
+    // First set specific field values
+    setFormData({
+      ...formData,
+      [id.replace('-', '_')]: value
+    });
+    
+    // Then set convenience fields that map to the EmailJS template
+    if (id === "email") {
+      setFormData(prev => ({ ...prev, reply_to: value }));
+    } else if (id === "message") {
+      setFormData(prev => ({ ...prev, message: value }));
+    } else if (id === "first-name" || id === "last-name") {
+      // Update from_name whenever first or last name changes
+      const firstName = id === "first-name" ? value : formData.first_name;
+      const lastName = id === "last-name" ? value : formData.last_name;
+      setFormData(prev => ({ 
+        ...prev, 
+        from_name: `${firstName} ${lastName}`.trim()
+      }));
+    }
+  }
+
   const handleFileChange = (e) => {
     if (e.target.files.length > 0) {
-      setFileName(e.target.files[0].name)
-      setIsUploaded(true)
+      const file = e.target.files[0];
+      setFileName(file.name);
+      setResumeFile(file);
+      setIsUploaded(true);
+      setFormData(prev => ({
+        ...prev,
+        resume_name: file.name
+      }));
     }
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Prepare data to send via EmailJS
+    const templateParams = {
+      from_name: formData.from_name,
+      to_name: formData.to_name,
+      message: formData.message,
+      reply_to: formData.reply_to,
+      subject: `Job Application: ${formData.position}`,
+      first_name: formData.first_name,
+      last_name: formData.last_name,
+      phone: formData.phone,
+      position: formData.position,
+      resume_name: formData.resume_name
+    };
+    
+    // Send email using EmailJS
+    emailjs.send(
+      "service_f1oy4hd",
+      "template_hhw956l",
+      templateParams,
+      "sPRSvqX1oUVKYnD2M",
+    ).then((result) => {
+      console.log("Email sent successfully:", result.text);
+      setSubmitStatus("success");
+      // Reset form
+      setFormData({
+        from_name: "",
+        to_name: "TechSoss HR",
+        message: "",
+        reply_to: "",
+        subject: "Job Application",
+        first_name: "",
+        last_name: "",
+        phone: "",
+        position: "",
+        resume_name: ""
+      });
+      setFileName("");
+      setResumeFile(null);
+      setIsUploaded(false);
+    }).catch((error) => {
+      console.error("Failed to send email:", error.text);
+      setSubmitStatus("error");
+    }).finally(() => {
+      setIsSubmitting(false);
+    });
   }
 
   return (
@@ -152,31 +251,62 @@ export default function Career() {
           <div>
             <h3 className="text-2xl font-bold text-slate-800 mb-6">Submit Your Resume</h3>
             <div className="bg-white rounded-xl p-6 shadow-md border border-slate-100">
-              <form className="space-y-4">
+              <form className="space-y-4" onSubmit={handleSubmit}>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="first-name">First Name</Label>
-                    <Input id="first-name" placeholder="John" />
+                    <Input 
+                      id="first-name" 
+                      placeholder="John" 
+                      value={formData.first_name}
+                      onChange={handleInputChange}
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="last-name">Last Name</Label>
-                    <Input id="last-name" placeholder="Doe" />
+                    <Input 
+                      id="last-name" 
+                      placeholder="Doe" 
+                      value={formData.last_name}
+                      onChange={handleInputChange}
+                      required
+                    />
                   </div>
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
-                  <Input id="email" type="email" placeholder="john.doe@example.com" />
+                  <Input 
+                    id="email" 
+                    type="email" 
+                    placeholder="john.doe@example.com" 
+                    value={formData.reply_to}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone</Label>
-                  <Input id="phone" placeholder="+1 (555) 123-4567" />
+                  <Input 
+                    id="phone" 
+                    placeholder="+1 (555) 123-4567" 
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="position">Position of Interest</Label>
-                  <Input id="position" placeholder="e.g. Cloud Architect" />
+                  <Input 
+                    id="position" 
+                    placeholder="e.g. Cloud Architect" 
+                    value={formData.position}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </div>
 
                 <div className="space-y-2">
@@ -184,6 +314,9 @@ export default function Career() {
                   <Textarea
                     id="message"
                     placeholder="Tell us about yourself and why you're interested in joining our team"
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    required
                   />
                 </div>
 
@@ -195,6 +328,8 @@ export default function Career() {
                       id="resume"
                       className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                       onChange={handleFileChange}
+                      accept=".pdf,.doc,.docx"
+                      required
                     />
                     {isUploaded ? (
                       <div className="flex items-center justify-center text-green-600">
@@ -211,11 +346,24 @@ export default function Career() {
                   </div>
                 </div>
 
+                {submitStatus === "success" && (
+                  <div className="p-3 bg-green-50 text-green-700 rounded-md">
+                    Your application has been submitted successfully! We'll review it and get back to you soon.
+                  </div>
+                )}
+                
+                {submitStatus === "error" && (
+                  <div className="p-3 bg-red-50 text-red-700 rounded-md">
+                    There was an error submitting your application. Please try again later.
+                  </div>
+                )}
+
                 <Button
                   type="submit"
+                  disabled={isSubmitting}
                   className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 transition-all duration-300 shadow-md hover:shadow-lg"
                 >
-                  Submit Application
+                  {isSubmitting ? "Submitting..." : "Submit Application"}
                 </Button>
               </form>
             </div>
@@ -227,4 +375,3 @@ export default function Career() {
     </div>
   )
 }
-
