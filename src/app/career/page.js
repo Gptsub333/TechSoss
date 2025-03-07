@@ -348,7 +348,7 @@ export default function Career() {
 
                 {submitStatus === "success" && (
                   <div className="p-3 bg-green-50 text-green-700 rounded-md">
-                    Your application has been submitted successfully! We'll review it and get back to you soon.
+                    Your application has been submitted successfully! We&apos;ll review it and get back to you soon.
                   </div>
                 )}
                 
