@@ -30,6 +30,9 @@ import {
   HelpCircle,
 } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useEffect } from "react";
+
+
 
 // Form schema using zod
 const formSchema = z.object({
@@ -207,6 +210,8 @@ const commonCertifications = [
 ]
 
 export default function VendorFormPage() {
+
+
   const [step, setStep] = useState(1)
   const [progress, setProgress] = useState(16.67)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -282,6 +287,17 @@ export default function VendorFormPage() {
     }
   }
 
+  useEffect(() => {
+    if (step === 2) {
+      form.setValue("contactName", "");
+      form.setValue("contactEmail", "");
+      form.setValue("contactPhone", "");
+      form.setValue("contactPosition", "");
+    }
+  }, [step, form]);
+  
+
+
   // Check if current step is valid
   const isStepValid = () => {
     let isValid = true
@@ -331,13 +347,6 @@ export default function VendorFormPage() {
   // Modify the renderStep function to conditionally reset fields when a step is first visited
   // Find the beginning of the renderStep function and replace it with this implementation:
   const renderStep = () => {
-    // If this is the first time visiting step 2, reset its fields
-    if (step === 2 && visitedSteps.indexOf(2) === -1) {
-      form.setValue("contactName", "")
-      form.setValue("contactEmail", "")
-      form.setValue("contactPhone", "")
-      form.setValue("contactPosition", "")
-    }
 
     switch (step) {
       case 1:
