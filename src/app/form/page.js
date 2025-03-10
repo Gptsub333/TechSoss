@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -30,9 +30,6 @@ import {
   HelpCircle,
 } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { useEffect } from "react";
-
-
 
 // Form schema using zod
 const formSchema = z.object({
@@ -40,7 +37,7 @@ const formSchema = z.object({
   companyName: z.string().min(2, { message: "Company name is required" }),
   website: z.string().url({ message: "Please enter a valid URL" }),
   foundingYear: z.string().regex(/^\d{4}$/, { message: "Please enter a valid year" }),
-  companySize: z.string(),
+  companySize: z.string().min(1, { message: "Company size is required" }),
   companyDescription: z
     .string()
     .min(50, { message: "Description must be at least 50 characters" })
@@ -53,7 +50,7 @@ const formSchema = z.object({
   contactPosition: z.string().min(2, { message: "Position is required" }),
 
   // Solution Categories
-  primaryCategory: z.string(),
+  primaryCategory: z.string().min(1, { message: "Primary category is required" }),
   secondaryCategories: z.array(z.string()).optional(),
 
   // Technical Details
@@ -210,15 +207,13 @@ const commonCertifications = [
 ]
 
 export default function VendorFormPage() {
-
-
   const [step, setStep] = useState(1)
   const [progress, setProgress] = useState(16.67)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
   const totalSteps = 6
 
-  // Add a new state to track which steps the user has visited
+  // Track which steps the user has visited
   const [visitedSteps, setVisitedSteps] = useState([1])
 
   // Initialize form
@@ -252,34 +247,106 @@ export default function VendorFormPage() {
       termsAccepted: false,
       marketingConsent: false,
     },
+    mode: "onChange", // Validate on change
   })
 
   // Handle form submission
-  function onSubmit(data) {
+  async function onSubmit(data) {
     setIsSubmitting(true)
 
-    // Simulate API call
-    setTimeout(() => {
-      console.log(data)
+    try {
+      console.log("Submitting form data:", data)
+      // Send the data to the backend API
+      const response = await fetch("http://localhost:8000/upload_to_startups", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to submit form")
+      }
+
+      // Handle successful submission
       setIsSubmitting(false)
       setIsSubmitted(true)
-    }, 2000)
+    } catch (error) {
+      console.error("Error submitting form:", error)
+      setIsSubmitting(false)
+      // You could add error state handling here
+    }
   }
 
-  // Modify the nextStep function to track visited steps
-  const nextStep = () => {
-    if (step < totalSteps) {
+  // Define validation schemas for each step
+  const stepValidationSchema = {
+    1: z.object({
+      companyName: formSchema.shape.companyName,
+      website: formSchema.shape.website,
+      foundingYear: formSchema.shape.foundingYear,
+      companySize: formSchema.shape.companySize,
+      companyDescription: formSchema.shape.companyDescription,
+    }),
+    2: z.object({
+      contactName: formSchema.shape.contactName,
+      contactEmail: formSchema.shape.contactEmail,
+      contactPhone: formSchema.shape.contactPhone,
+      contactPosition: formSchema.shape.contactPosition,
+    }),
+    3: z.object({
+      primaryCategory: formSchema.shape.primaryCategory,
+    }),
+    // No required fields for steps 4 and 5
+    6: z.object({
+      valueProposition: formSchema.shape.valueProposition,
+      competitiveAdvantage: formSchema.shape.competitiveAdvantage,
+      termsAccepted: formSchema.shape.termsAccepted,
+    }),
+  }
+
+  // Validate current step
+  const validateStep = async () => {
+    // Get validation schema for current step
+    const schema = stepValidationSchema[step]
+    if (!schema) return true // If no validation schema exists for this step, allow proceeding
+
+    // Extract fields for current step
+    const currentStepData = {}
+    Object.keys(schema.shape).forEach((key) => {
+      currentStepData[key] = form.getValues(key)
+    })
+
+    try {
+      // Validate current step fields
+      await schema.parseAsync(currentStepData)
+      return true
+    } catch (error) {
+      // Trigger validation for all fields in current step
+      Object.keys(schema.shape).forEach((key) => {
+        form.trigger(key)
+      })
+      return false
+    }
+  }
+
+  // Next step handler with validation
+  const handleNext = async () => {
+    const isValid = await validateStep()
+
+    if (isValid) {
       const newStep = step + 1
       setStep(newStep)
       setProgress((newStep / totalSteps) * 100)
 
       // Add the new step to visitedSteps if it hasn't been visited before
       if (!visitedSteps.includes(newStep)) {
-        setVisitedSteps([...visitedSteps, newStep])
+        setVisitedSteps((prev) => [...prev, newStep])
       }
     }
   }
 
+  // Previous step handler
   const prevStep = () => {
     if (step > 1) {
       setStep(step - 1)
@@ -287,67 +354,50 @@ export default function VendorFormPage() {
     }
   }
 
+  // Reset field values when a user visits a step for the first time
   useEffect(() => {
-    if (step === 2) {
-      form.setValue("contactName", "");
-      form.setValue("contactEmail", "");
-      form.setValue("contactPhone", "");
-      form.setValue("contactPosition", "");
-    }
-  }, [step, form]);
-  
+    // If this is the first time visiting this step (except step 1)
+    const isFirstVisit = visitedSteps.length === visitedSteps.indexOf(step) + 1 && step !== 1
 
-
-  // Check if current step is valid
-  const isStepValid = () => {
-    let isValid = true
-
-    if (step === 1) {
-      const fields = ["companyName", "website", "foundingYear", "companySize", "companyDescription"]
-      fields.forEach((field) => {
-        if (!form.getValues(field)) {
-          form.setError(field, {
-            type: "required",
-            message: `${field.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())} is required`,
-          })
-          isValid = false
-        }
-      })
-    } else if (step === 2) {
-      const fields = ["contactName", "contactEmail", "contactPhone", "contactPosition"]
-      fields.forEach((field) => {
-        if (!form.getValues(field)) {
-          form.setError(field, {
-            type: "required",
-            message: `${field.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase())} is required`,
-          })
-          isValid = false
-        }
-      })
-    } else if (step === 3) {
-      if (!form.getValues("primaryCategory")) {
-        form.setError("primaryCategory", {
-          type: "required",
-          message: "Primary category is required",
-        })
-        isValid = false
+    if (isFirstVisit) {
+      // Reset fields for this step based on which step we're on
+      switch (step) {
+        case 2:
+          form.setValue("contactName", "")
+          form.setValue("contactEmail", "")
+          form.setValue("contactPhone", "")
+          form.setValue("contactPosition", "")
+          break
+        case 3:
+          form.setValue("primaryCategory", "")
+          form.setValue("secondaryCategories", [])
+          form.setValue("technicalCapabilities", [])
+          form.setValue("deploymentModels", [])
+          form.setValue("integrationOptions", [])
+          break
+        case 4:
+          form.setValue("targetIndustries", [])
+          form.setValue("geographicCoverage", [])
+          form.setValue("clientSizePreference", [])
+          break
+        case 5:
+          form.setValue("yearsInBusiness", "")
+          form.setValue("certifications", [])
+          form.setValue("partnerships", "")
+          form.setValue("caseStudyAvailable", false)
+          form.setValue("referenceAvailable", false)
+          break
+        case 6:
+          form.setValue("valueProposition", "")
+          form.setValue("competitiveAdvantage", "")
+          form.setValue("termsAccepted", false)
+          form.setValue("marketingConsent", false)
+          break
       }
     }
+  }, [step, visitedSteps, form])
 
-    return isValid
-  }
-
-  // Handle next button click with validation
-  const handleNext = () => {
-    if (isStepValid()) {
-      nextStep()
-    }
-  }
-
-  // Modify the renderStep function to conditionally reset fields when a step is first visited
-  // Find the beginning of the renderStep function and replace it with this implementation:
   const renderStep = () => {
-
     switch (step) {
       case 1:
         return (
@@ -412,7 +462,7 @@ export default function VendorFormPage() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Company Size*</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select company size" />
@@ -559,7 +609,7 @@ export default function VendorFormPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Primary Solution Category*</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select your primary category" />
@@ -882,7 +932,7 @@ export default function VendorFormPage() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Years in Business</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select years in business" />
